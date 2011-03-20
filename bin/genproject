@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 require 'fileutils'
 
 if ARGV.count == 0 then
@@ -25,8 +25,8 @@ system('git init')
 makefile_am_contents = <<HERE
 SUBDIRS = src
 HERE
-File.open('makefile.am', 'w') {|f| f.write(makefile_am_contents) }
-system('git add makefile.am')
+File.open('Makefile.am', 'w') {|f| f.write(makefile_am_contents) }
+system('git add Makefile.am')
 
 configure_ac_contents = <<HERE
 AC_INIT([#{project_name}], [1.0], [your_email@example.org])
@@ -60,7 +60,7 @@ makefile_am_contents = <<HERE
 bin_PROGRAMS = #{project_name}
 #{project_name}_SOURCES = #{project_name}.cpp #{class_files.map {|x| "#{x}.cpp #{x}.hpp"}.join(' ')}
 HERE
-File.open('makefile.am', 'w') {|f| f.write(makefile_am_contents) }
+File.open('Makefile.am', 'w') {|f| f.write(makefile_am_contents) }
 system('git add *')
 
 FileUtils.cd('..')
