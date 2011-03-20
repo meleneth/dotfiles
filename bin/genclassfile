@@ -1,0 +1,55 @@
+#!/usr/bin/ruby
+
+if ARGV.count != 1 then
+	puts <<HERE
+Usage: genclassfile class_name
+	Generates class_name.cpp and class_name.hpp, that define interface and 
+basic implementation of a class ClassName.  Note ClassName is automatically
+caps munged and underscores are turned into CamelCase
+HERE
+	exit
+end
+
+classfile = ARGV[0]
+classname = classfile.split(/_/).map {|x| x.capitalize}.join('')
+
+header_filename = "#{classfile}.hpp"
+class_filename = "#{classfile}.cpp"
+
+if File.exists? header_filename or File.exists? class_filename then
+	puts "File already exists, bombing out"
+end
+
+include_guard = "#{classname.upcase}_HPP"
+
+header_contents = <<HERE
+#ifndef #{include_guard}
+#define #{include_guard}
+
+class #{classname} {
+	#{classname}();
+	~#{classname}();
+};
+
+#endif
+HERE
+
+File.open(header_filename, 'w') {|f| f.write(header_contents) }
+
+
+class_contents = <<HERE
+#include "#{header_filename}"
+
+#{classname}::#{classname}()
+{
+}
+
+#{classname}::~#{classname}()
+{
+}
+HERE
+
+File.open(class_filename, 'w') {|f| f.write(class_contents) }
+
+
+puts "#{classfile} : #{classname}"

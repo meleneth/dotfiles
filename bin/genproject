@@ -1,0 +1,72 @@
+#!/usr/bin/ruby
+require 'fileutils'
+
+if ARGV.count == 0 then
+	puts <<HERE
+Usage: genclassfile project_name class_name class_name class_name
+
+	Generates a C++ skeleton project in a directory named project_name.
+	Will call genclassfile for each class_name, in the src directory.
+	Build files will be generated.  Git will be initialized in the project root.
+	All files needed to generate the build system will be added to git.
+HERE
+	exit
+end
+
+project_name = ARGV[0]
+class_files = ARGV
+class_files.shift
+
+FileUtils.mkdir(project_name)
+FileUtils.cd(project_name)
+
+system('git init')
+
+makefile_am_contents = <<HERE
+SUBDIRS = src
+HERE
+File.open('makefile.am', 'w') {|f| f.write(makefile_am_contents) }
+system('git add makefile.am')
+
+configure_ac_contents = <<HERE
+AC_INIT([#{project_name}], [1.0], [your_email@example.org])
+AM_INIT_AUTOMAKE([foreign -Wall -Werror])
+AC_PROG_CXX
+AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_FILES([Makefile src/Makefile])
+AC_OUTPUT
+
+HERE
+File.open('configure.ac', 'w') {|f| f.write(configure_ac_contents) }
+system('git add configure.ac')
+
+FileUtils.mkdir('src')
+FileUtils.cd('src')
+class_files.each { |x| system("genclassfile #{x}") }
+
+main_contents = <<HERE
+#include<iostream>
+using namespace std;
+
+int main(int argc, char *argv[])
+{
+	cout << "#{project_name} 1.0" << endl;
+	return 0;
+}
+HERE
+File.open("#{project_name}.cpp", 'w') {|f| f.write(main_contents) }
+
+makefile_am_contents = <<HERE
+bin_PROGRAMS = #{project_name}
+#{project_name}_SOURCES = #{project_name}.cpp #{class_files.map {|x| "#{x}.cpp #{x}.hpp"}.join(' ')}
+HERE
+File.open('makefile.am', 'w') {|f| f.write(makefile_am_contents) }
+system('git add *')
+
+FileUtils.cd('..')
+
+system('autoreconf --install')
+system('./configure')
+system('make')
+FileUtils.cd('..')
+
