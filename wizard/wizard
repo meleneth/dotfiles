@@ -1,0 +1,48 @@
+#!/usr/bin/env ruby
+
+# W.I.Z.A.R.D.
+
+require 'pathname'
+
+$LOAD_PATH << "#{Pathname.new(File.expand_path(__FILE__)).realpath.dirname}"
+
+require 'lib/function'
+require 'lib/class'
+require 'lib/file'
+require 'lib/project'
+
+def create_project(project_name)
+  project = WizardProject.new(project_name)
+
+  project_class = WizardClass.new(project_name)
+  project.classes << project_class
+
+  main_file = WizardFile.new "src/#{project_name}.cpp"
+  project.files << main_file
+
+  main = WizardFunction.new('int', 'main', 'int argc, char *argv[]')
+  main.body << "cout << \"#{ project_name }\""
+  main.body << "return 0;"
+  main_file.body << main
+
+  makefile_am = WizardFile.new "Makefile.am"
+
+#makefile_am.body << <<HERE
+#this is a multi line text field
+#so I can type long strings
+#HERE
+
+end
+
+guinea = create_project('guinea')
+#guinea.generate
+
+ralph = WizardClass.new('Ralph')
+
+puts ralph.as_header
+puts
+puts ralph.as_body
+
+
+
+
