@@ -18,7 +18,7 @@ set statusline=[%n]\ %F\ %(\ %M%R%H)%)\ \@(%l\,%c%V)\ %P
 "hi normal ctermfg=white ctermbg=black guifg=white guibg=black
 hi nontext ctermfg=blue ctermbg=black guifg=blue guibg=black
 set guifont=kates
-set sw=4 ts=4
+set sw=2 ts=2
 "autocmds
 autocmd!
 
@@ -155,7 +155,7 @@ map! ,exp use base qw/Exporter/;<CR>use vars qw/@EXPORT_OK/;<CR>@EXPORT_OK = qw/
 map! ,fr Uint32 max_no = .size();<CR>for(Uint32 i=0; i<max_no; ++i){<CR>[i];}<ESC>bi
 map ,d :set nowrap<CR>:CVSVimDiff<CR>:redraw!<CR>
 
-map ,a :call Auto_Tableize()<cr>
+"map ,a :call Auto_Tableize()<cr>
 
 map <F2> :bp<CR>
 map! <F2> <ESC>:bp<CR>

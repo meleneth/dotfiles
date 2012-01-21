@@ -7,11 +7,15 @@ export RSYNC_RSH=ssh
 # If running interactively, then:
 if [ "$PS1" ]; then
 
-    # enable color support of ls and also add handy aliases
+export TERM=xterm-256color
 
-    #eval `dircolors`
-    alias x="ssh-agent startx & exit"
-    alias mdu='du -h --max-depth 1 |grep M |sort -g'
+# enable color support of ls and also add handy aliases
+
+alias ls="ls --color"
+
+#eval `dircolors`
+alias x="ssh-agent startx & exit"
+alias mdu='du -h --max-depth 1 |grep M |sort -g'
 
 # set a fancy prompt
 #change these if you don't dig my colors!
@@ -100,3 +104,5 @@ export CAP_USER=jason
 alias ri="ri -Tf ansi"
 
 alias rt="rake test > test_output.txt 2>&1 ; less test_output.txt"
+
+

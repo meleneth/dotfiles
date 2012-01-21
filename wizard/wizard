@@ -21,7 +21,7 @@ def create_project(project_name)
   project.files << main_file
 
   main = WizardFunction.new('int', 'main', 'int argc, char *argv[]')
-  main.body << "cout << \"#{ project_name }\""
+  main.body << "cout << \"#{ project_name }\";"
   main.body << "return 0;"
   main_file.body << main
 
@@ -32,17 +32,64 @@ def create_project(project_name)
 #so I can type long strings
 #HERE
 
+  return project
 end
 
-guinea = create_project('guinea')
+#guinea = create_project('guinea')
 #guinea.generate
 
-ralph = WizardClass.new('Ralph')
+#ralph = WizardClass.new('Ralph')
+#
+#puts ralph.as_header
+#puts
+#puts ralph.as_body
 
-puts ralph.as_header
-puts
-puts ralph.as_body
+ARGV[0] = 'help' if ARGV.count == 0
 
+if ARGV[0] == "help" then
+  puts <<EOF
+wizard project guinea guineat
+cd guinea/src
 
+#  make some classes.  First word after class is magic, if it is the name of an executable or
+# library it is linked with that file.  Otherwise, links to the first program.
+wizard class shape
+wizard class triangle:shape
+wizard class rectangle:shape
 
+# convert build to library based.  First argument is new library name, after that are class names.
+# at the end are a list of targets that will link with the new library.
+# if the individual file used to be in the list for a given target, it will be removed and
+# the library will be added to that executable.
+wizard library geometry shape triangle rectangle guinea guineat
+
+EOF
+  exit
+end
+
+command = ARGV.shift
+if command == "project" then
+  ARGV[0] = 'help' if ARGV.count == 0
+
+  if ARGV[0] == "help" then
+    puts <<EOT
+Project creation specific explanation
+EOT
+  exit
+  end
+
+  project_name = ARGV.shift
+  other_executables = ARGV
+
+  if File.directory? project_name then
+    puts "Aborting: directory #{project_name} already exists"
+    exit
+  end
+
+  project = create_project(project_name)
+  project.generate
+
+end
+
+puts ARGV
 
