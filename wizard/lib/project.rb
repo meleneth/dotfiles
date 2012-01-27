@@ -1,12 +1,13 @@
 require 'fileutils'
 
 class WizardProject
-  attr_accessor :project_name, :files, :classes
+  attr_accessor :project_name, :files, :classes, :makefile
 
   def initialize(project_name)
     @project_name = project_name
     @files = []
     @classes = []
+    @makefile = nil
   end
 
   def generate
@@ -15,7 +16,11 @@ class WizardProject
     system('git init')
 
     FileUtils.mkdir('src')
+    FileUtils.mkdir('bin')
     FileUtils.mkdir('m4')
+
+    FileUtils.touch('bin/.empty')
+    FileUtils.touch('m4/.empty')
 
     configure_ac_contents = <<HERE
 AC_INIT([#{project_name}], [1.0], [your_email@example.org])

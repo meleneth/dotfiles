@@ -14,25 +14,41 @@ require 'lib/project'
 def create_project(project_name)
   project = WizardProject.new(project_name)
 
-  project_class = WizardClass.new(project_name)
-  project.classes << project_class
+#  project_class = WizardClass.new(project_name)
+#  project.classes << project_class
 
-  main_file = WizardFile.new "src/#{project_name}.cpp"
-  project.files << main_file
+  makefile_am = WizardMakefile.new
+  project.files << makefile_am
+
+  makefile_am.key_order << "ACLOCAL_AMFLAGS"
+  makefile_am.key_values["ACLOCAL_AMFLAGS"] = "-I m4"
+
+  project.makefile = makefile_am
+
+  return project
+end
+
+def add_executable(project, executable_name)
+
+  if not project.makefile.key_values.has_key? "bin_PROGRAMS" then
+    project.makefile.key_order.unshift 'bin_PROGRAMS'
+    project.makefile.key_values['bin_PROGRAMS'] = executable_name
+  else
+    project.makefile.key_values['bin_PROGRAMS'] = "#{project.makefile.key_values['bin_PROGRAMS']} #{executable_name}"
+  end
+
+  project.makefile.key_order << "bin_#{executable_name}_SOURCES"
+  project.makefile.key_values["bin_#{executable_name}_SOURCES"] = "src/#{executable_name}.cpp"
+
+  main_file = WizardFile.new "src/#{executable_name}.cpp"
 
   main = WizardFunction.new('int', 'main', 'int argc, char *argv[]')
-  main.body << "cout << \"#{ project_name }\";"
+  main.body << "cout << \"#{ project_name }: #{executable_name}\";"
   main.body << "return 0;"
   main_file.body << main
 
-  makefile_am = WizardFile.new "Makefile.am"
-
-#makefile_am.body << <<HERE
-#this is a multi line text field
-#so I can type long strings
-#HERE
-
-  return project
+  project.files << main_file
+  
 end
 
 #guinea = create_project('guinea')
@@ -73,7 +89,9 @@ if command == "project" then
 
   if ARGV[0] == "help" then
     puts <<EOT
-Project creation specific explanation
+wizard project pyro pyrot
+
+  Will create a new project named 'pyro' with executables 'pyro' and 'pyrot'
 EOT
   exit
   end
@@ -81,12 +99,18 @@ EOT
   project_name = ARGV.shift
   other_executables = ARGV
 
+  puts "Creating project #{project_name}"
+  puts "Additional executables: #{other_executables.join(', ')}" unless other_executables.empty?
+
   if File.directory? project_name then
     puts "Aborting: directory #{project_name} already exists"
     exit
   end
 
   project = create_project(project_name)
+  add_executable(project, project_name)
+  other_executables.each {|x| add_executable(project, x) } 
+
   project.generate
 
 end
