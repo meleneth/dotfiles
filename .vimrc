@@ -168,4 +168,3 @@ map! <F9> <ESC>:w<CR>:make<CR>
 map <F5> :e .<CR> 
 map! <F5> <ESC>:e .<CR> 
 
-source ~/.vim/msw/_collected__msw_vimrc_source_files__
