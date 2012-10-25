@@ -27,8 +27,9 @@ header_contents = <<HERE
 #define #{include_guard}
 
 class #{classname} {
-	#{classname}();
-	~#{classname}();
+  public:
+    #{classname}();
+    ~#{classname}();
 };
 
 #endif
