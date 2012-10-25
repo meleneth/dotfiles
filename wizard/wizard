@@ -17,7 +17,7 @@ def create_project(project_name)
 #  project_class = WizardClass.new(project_name)
 #  project.classes << project_class
 
-  makefile_am = WizardMakefile.new
+  makefile_am = WizardMakefile.new "Makefile.am"
   project.files << makefile_am
 
   makefile_am.key_order << "ACLOCAL_AMFLAGS"
@@ -32,20 +32,23 @@ def add_executable(project, executable_name)
 
   if not project.makefile.key_values.has_key? "bin_PROGRAMS" then
     project.makefile.key_order.unshift 'bin_PROGRAMS'
-    project.makefile.key_values['bin_PROGRAMS'] = executable_name
+    project.makefile.key_values['bin_PROGRAMS'] = "bin/#{executable_name}"
   else
-    project.makefile.key_values['bin_PROGRAMS'] = "#{project.makefile.key_values['bin_PROGRAMS']} #{executable_name}"
+    project.makefile.key_values['bin_PROGRAMS'] = "#{project.makefile.key_values['bin_PROGRAMS']} bin/#{executable_name}"
   end
 
   project.makefile.key_order << "bin_#{executable_name}_SOURCES"
   project.makefile.key_values["bin_#{executable_name}_SOURCES"] = "src/#{executable_name}.cpp"
 
-  main_file = WizardFile.new "src/#{executable_name}.cpp"
+  main_file = WizardSourceFile.new "src/#{executable_name}.cpp"
 
   main = WizardFunction.new('int', 'main', 'int argc, char *argv[]')
-  main.body << "cout << \"#{ project_name }: #{executable_name}\";"
+  main.body << "cout << \"#{ project.project_name }: #{executable_name}\\n\";"
   main.body << "return 0;"
-  main_file.body << main
+
+  main_file.functions << main
+  main_file.includes << "#include <iostream>"
+  main_file.includes << "using namespace std;"
 
   project.files << main_file
   
@@ -114,6 +117,4 @@ EOT
   project.generate
 
 end
-
-puts ARGV
 

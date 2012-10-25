@@ -20,11 +20,13 @@ class WizardProject
     FileUtils.mkdir('m4')
 
     FileUtils.touch('bin/.empty')
+    system('git add bin/.empty')
     FileUtils.touch('m4/.empty')
+    system('git add m4/.empty')
 
     configure_ac_contents = <<HERE
 AC_INIT([#{project_name}], [1.0], [your_email@example.org])
-AM_INIT_AUTOMAKE([foreign -Wall -Werror])
+AM_INIT_AUTOMAKE([foreign -Wall -Werror subdir-objects])
 AC_PROG_CXX
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile])
@@ -36,17 +38,14 @@ HERE
     File.open('configure.ac', 'w') {|f| f.write(configure_ac_contents) }
     system('git add configure.ac')
 
-    makefile_am_contents = <<HERE
-bin_PROGRAMS = src/#{project_name}
-src_#{project_name}_SOURCES = src/#{project_name}.cpp
+    @files.each do |f| 
+      f.save_file
+      system("git add #{f.filename}")
+    end
 
-ACLOCAL_AMFLAGS = -I m4
-HERE
+    system("git commit -a -m \"initial import of #{project_name}\"")
 
 #{class_files.map {|x| "#{x}.cpp #{x}.hpp"}.join(' ')}
-
-    File.open('Makefile.am', 'w') {|f| f.write(makefile_am_contents) }
-    system('git add Makefile.am')
 
     system('autoreconf --install')
     system('./configure')

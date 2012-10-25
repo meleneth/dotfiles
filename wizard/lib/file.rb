@@ -3,13 +3,8 @@ require 'fileutils'
 class WizardFile
   attr_accessor :filename, :body
 
-  def initialize
-    @body = []
-    @filename = ""
-  end
-
   def initialize(filename)
-    initialize
+    @body     = Array.new
     @filename = filename
   end
 
@@ -29,18 +24,20 @@ class WizardFile
 end
 
 class WizardSourceFile < WizardFile
-  def initialize 
-    super
-    @includes  = []
-    @classes   = []
-    @functions = []
+  attr_accessor :includes, :classes, :functions
+
+  def initialize(filename)
+    super(filename)
+    @includes  = Array.new
+    @classes   = Array.new
+    @functions = Array.new
   end
 
   def as_text
     return <<EOT
 #{ @includes.join("\n") }
 
-#{ @functions.join("\n") }
+#{ @functions.map {|x| x.as_body}.join("\n") }
 
 EOT
   end
@@ -49,12 +46,11 @@ end
 class WizardMakefile < WizardFile
   attr_accessor :key_order, :key_values
 
-  def intialize()
-    super
-    @filename = "Makefile.am"
+  def initialize(filename)
+    super(filename)
 
-    @key_order = []
-    @key_values = {}
+    @key_order  = Array.new
+    @key_values = Hash.new
   end
 
   def as_text
