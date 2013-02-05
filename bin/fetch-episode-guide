@@ -1,0 +1,58 @@
+#!/usr/bin/env ruby
+
+require 'open-uri'
+require 'nokogiri'
+require 'json'
+
+series_search_doc = Nokogiri::HTML(open("http://www.tv.com/search?q=#{ARGV.join('+')}"))
+
+#File.open("series_search_result.html", 'w') { |file| file.write(series_search_doc.to_html) }
+#series_search_doc = Nokogiri::HTML(open("series_search_result.html"))
+
+base_url = "http://www.tv.com"
+
+links = series_search_doc.css("a").select {|l| l.content =~ /Episode Guide/}
+
+episode_guide_url = links[0].get_attribute("href")
+
+puts "Found guide: #{episode_guide_url}"
+
+full_episode_guide_url = "#{base_url}#{episode_guide_url}"
+sleep 10
+
+episode_guide_index_doc = Nokogiri::HTML(open(full_episode_guide_url))
+
+
+#File.open("episode_guide_index_result.html", 'w') { |file| file.write(episode_guide_index_doc.to_html) }
+#episode_guide_index_doc = Nokogiri::HTML(open("episode_guide_index_result.html"))
+
+div = episode_guide_index_doc.css('div._col_a1')
+links = div.css("a").collect {|c| c.get_attribute("href")}
+
+full_info = []
+links.each do |link|
+    next if link == episode_guide_url
+    puts link
+    #/shows/boston-legal/season-5/
+    season_page_url = "#{base_url}#{link}"
+
+    sleep 10
+    season_page_doc = Nokogiri::HTML(open(season_page_url)) 
+    #File.open("episode_guide_season_result.html", 'w') { |file| file.write(season_page_doc.to_html) }
+    #season_page_doc = Nokogiri::HTML(open("episode_guide_season_result.html"))
+
+    episodes = season_page_doc.css('div.description').map {|d| d.parent}
+    episodes.each do |episode|
+      info = {}
+      info[:season_no] = link.gsub(/.*season-([^\/])\//, '\1')
+      info[:name] = episode.css(".title")[0].content.strip
+      info[:episode_no] = episode.css(".ep_info")[0].content.strip.gsub(/Episode /, "")
+      info[:description] = episode.css(".description")[0].content.strip.gsub(/moreless$/, "").gsub(/[^-`~!@#\$%^&*| &,:;+=_a-zA-Z0-9'.\\\/(){}\[\]]/, " ")
+      full_info << info
+    end
+
+    sleep 10
+end
+
+File.open("#{ARGV.join(' ')}.json", 'w') { |file| file.write(full_info.to_json) }
+
