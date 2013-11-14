@@ -164,6 +164,8 @@ map! <F8> <ESC>\be
 map <F8> \be
 map <F9> :w<CR>:make<CR> 
 map! <F9> <ESC>:w<CR>:make<CR> 
+map <F10> <ESC>:TlistToggle<CR> 
+map! <F10> <ESC>:TlistToggle<CR> 
 map <F5> :e .<CR> 
 map! <F5> <ESC>:e .<CR> 
 

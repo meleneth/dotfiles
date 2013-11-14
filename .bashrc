@@ -7,7 +7,7 @@ export RSYNC_RSH=ssh
 # If running interactively, then:
 if [ "$PS1" ]; then
 
-export TERM=xterm-256color
+#export TERM=linux
 
 # enable color support of ls and also add handy aliases
 
@@ -55,7 +55,7 @@ alias mdu='du -h --max-depth 1 |grep M |sort -g'
 fi
 
 export EDITOR=vim
-export PATH=/www/bin:/usr/local/bin:/usr/local/sbin:$PATH:~/bin
+export PATH=$PATH:~/bin
 
 mkdir -p ~/var
 
@@ -102,7 +102,7 @@ export LSCOLORS=HxFxCxDxBxegedabagacad
 export CAP_USER=jason
 
 alias ri="ri -Tf ansi"
+alias make="make -j 16"
 
 alias rt="rake test > test_output.txt 2>&1 ; less test_output.txt"
-
 
