@@ -86,8 +86,8 @@ umask 002
 
 HN=`hostname -s`
 
-if [ -f ~/.bash/${HN}.bashrc ]; then
-    . ~/.bash/${HN}.bashrc
+if [ -f ~/dotfiles/${HN}.bashrc ]; then
+    . ~/dotfiles/${HN}.bashrc
 fi
 
 if [ -f ~/.agent_cmd ]; then
