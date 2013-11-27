@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+
+#flail - a program to capture build information from a Makefile
+# to autogenerate an automake build system
+
+
+# Phase 1: record build information to a .json file
+# this involves masquerading as gcc, ld etc and passing through arguments 
+# to the real commands after adding them to the tracking .json file
+#
+# (this will slow down the build, but that's OK because we're about to replace the whole build system)
+
+# usage - flail go
+# what it does:
+# deletes and initializes the .json file, including adding an env var
+# modifies it's own environment for CC etc
+# runs the build - expects symlinks to be installed, ala flail-gcc
+# as each command spawns, update the .json file with the new info and run the actual command
+# return value should be preserved in case of non-zero exit from subshell
+#
