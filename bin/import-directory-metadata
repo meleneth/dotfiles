@@ -1,0 +1,27 @@
+#!/usr/bin/env ruby
+
+#recursive scan this directory for file size information, write to a .json file
+
+require "rubygems"
+require "awesome_print"
+require "find"
+
+cwd = Dir.pwd
+
+all_files = []
+
+Find.find(cwd) do |f|
+  next unless File.file? f
+  stats = File::Stat.new f
+  relpath = f[cwd.length .. -1]
+  info = { 
+           :filename => File.basename(f), 
+           :relpath => File.dirname(relpath),
+           :size => stats.size, 
+          }
+
+  all_files << info
+end
+
+ap all_files
+
