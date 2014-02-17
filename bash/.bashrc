@@ -84,10 +84,9 @@ alias st="for i in ~/var/dir* ; do echo \$i ; cat \$i ; echo ; done"
 
 umask 002
 
-HN=`hostname -s`
 
-if [ -f ~/dotfiles/${HN}.bashrc ]; then
-    . ~/dotfiles/${HN}.bashrc
+if [ -f ~/dotfiles/bash/${HOSTNAME}.bashrc ]; then
+    . ~/dotfiles/${HOSTNAME}.bashrc
 fi
 
 if [ -f ~/.agent_cmd ]; then

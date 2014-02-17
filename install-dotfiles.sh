@@ -4,7 +4,7 @@ cd ~/
 rm ~/.bashrc
 rm ~/.vimrc
 rm ~/.railsrc
-ln -s ~/dotfiles/.bashrc ~/.bashrc
+ln -s ~/dotfiles/bash/.bashrc ~/.bashrc
 ln -s ~/dotfiles/.railsrc ~/.railsrc
 ln -s ~/dotfiles/.vimrc ~/.vimrc
 
