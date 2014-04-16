@@ -42,6 +42,7 @@ alias mdu='du -h --max-depth 1 |grep M |sort -g'
 #* 46 Cyan
 #* 47 White
 
+    DF="\[\033[0m\]" #default?
     NM="\[\033[0;1;37m\]" #means no background and wihite lines
     HI="\[\033[0;1;34m\]" #change this for letter colors
     HN="\[\033[0;36m\]" # hostname colors
@@ -51,7 +52,7 @@ alias mdu='du -h --max-depth 1 |grep M |sort -g'
     LG="\[\033[0;1;37m\]" # Light Grey
     DG="\[\033[0;37m\]" # Dark Grey
     PS1="$LGÚ$DGÄ[$HN\u $NI@ $HN\h \w$DG]Ä$LGÄ¿\n$LGÀÄ$DGÄ\$$IN"
-    PS1="$NM[=- $HI\u$NI@$HN\h $SI\w$NM -=]\n  \$$IN"
+    PS1="$NM[=- $HI\u$NI@$HN\h $SI\w$NM -=]\n  \$$DF"
 fi
 
 export EDITOR=vim
