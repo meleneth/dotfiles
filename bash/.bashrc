@@ -86,7 +86,7 @@ umask 002
 
 
 if [ -f ~/dotfiles/bash/${HOSTNAME}.bashrc ]; then
-    . ~/dotfiles/${HOSTNAME}.bashrc
+    . ~/dotfiles/bash/${HOSTNAME}.bashrc
 fi
 
 if [ -f ~/.agent_cmd ]; then
