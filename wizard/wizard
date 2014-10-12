@@ -6,10 +6,10 @@ require 'pathname'
 
 $LOAD_PATH << "#{Pathname.new(File.expand_path(__FILE__)).realpath.dirname}"
 
-require 'lib/function'
-require 'lib/class'
-require 'lib/file'
-require 'lib/project'
+require 'lib/wizard_function'
+require 'lib/wizard_class'
+require 'lib/wizard_file'
+require 'lib/wizard_project'
 
 def create_project(project_name)
   project = WizardProject.new(project_name)
