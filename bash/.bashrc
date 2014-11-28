@@ -108,4 +108,4 @@ alias rt="rake test > test_output.txt 2>&1 ; less test_output.txt"
 
 if [ -d ~/.rvm/bin ]; then
   PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
-end
+fi
