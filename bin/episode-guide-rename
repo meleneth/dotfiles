@@ -1,0 +1,78 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'open-uri'
+require 'nokogiri'
+require 'json'
+require 'awesome_print'
+require 'table_print'
+require 'find'
+
+class FilenameParser
+  attr_accessor :season
+  attr_accessor :episode
+  attr_accessor :filename
+
+  def initialize(filename)
+    @filename = filename
+    @season = ""
+    @episode = ""
+
+    if matched = filename.match(/S(\d+)\s(\d+)/) then
+      @season = matched[1]
+      @episode = matched[2]
+    end
+  end
+
+  def is_video?
+    extension.match(/(avi|mkv|mpg|mpeg|m4v)/)
+  end
+
+  def basename
+    File.basename @filename
+  end
+
+  def extension
+    File.extname @filename
+  end
+
+  def dirname
+    File.dirname @filename
+  end
+end
+
+filename = ARGV[0]
+puts "Reading #{filename}"
+
+file = File.read(filename)
+data = JSON.parse(file)
+
+series = File.basename(ARGV[0], ".*")
+puts series
+
+ap data
+
+episodes = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
+
+data.each do |d|
+  episodes[d["season_no"]][d["episode_no"]] = d["name"]
+end
+
+ap episodes
+
+Find.find('.') do |e|
+  next if File.directory? e
+  fp = FilenameParser.new e
+#  awesome_print fp
+  next unless fp.is_video?
+
+#  puts "is_video (ahuh)" if fp.is_video?
+#  puts "basename: #{fp.basename}"
+#  puts "extension: #{fp.extension}"
+#  puts "dirname: #{fp.dirname}"
+#
+#  puts "FINAL::"
+  puts " mv \"#{fp.filename}\" \"#{fp.dirname}/#{series} - s#{fp.season}e#{fp.episode} - #{episodes[fp.season][fp.episode]}#{fp.extension}\""
+end
+
+# vim: ft=ruby
