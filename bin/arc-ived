@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+
+# ask couchdb if the given filenames exist, and show it
+
+require 'rubygems'
+require 'awesome_print'
+require 'table_print'
+require 'optparse'
+require 'couchrest'
+require 'socket'
+require 'pathname'
+
+$LOAD_PATH << File.expand_path(File.join(*%w[ .. lib ]), Pathname.new(File.expand_path(__FILE__)).realpath.dirname)
+
+require 'data_wrapper'
+
+db = CouchRest.database!("http://clu:5984/archimedes-media")
+
+#db.documents['rows'].each do |doc|
+#  document = db.get doc["id"]
+#  ap document
+#end
+
+ARGV.each do |filename|
+  row = db.view('media_by_name/media_by_name', :key => filename)
+
+  if row["rows"].count > 0
+    puts "YES #{filename}"
+    data = []
+    row["rows"].each do |row|
+      document = db.get row["id"]
+      data << DataWrapper.new(document)
+    end
+    tp data, "media", "media_label", "case", "location", "path", "size"
+  else
+    puts "NO  #{filename}"
+  end
+end
+

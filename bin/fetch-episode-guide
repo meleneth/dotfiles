@@ -4,7 +4,7 @@ require 'open-uri'
 require 'nokogiri'
 require 'json'
 
-series_search_doc = Nokogiri::HTML(open("http://www.tv.com/search?q=#{ARGV.join('+')}"))
+series_search_doc = Nokogiri::HTML(open("http://www.tv.com/search?q=#{ARGV.join('%20')}"))
 
 #File.open("series_search_result.html", 'w') { |file| file.write(series_search_doc.to_html) }
 #series_search_doc = Nokogiri::HTML(open("series_search_result.html"))

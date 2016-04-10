@@ -1,0 +1,85 @@
+#!/usr/bin/env ruby
+
+#recursive scan this directory for file size information, imports to couchdb
+
+#./arc-import -m bd -c Mel-X-Libram -l p1d1 /media/cdrom0
+
+
+require 'rubygems'
+require 'awesome_print'
+require 'find'
+require 'optparse'
+require 'couchrest'
+require 'socket'
+
+def media_label(media_path)
+  result = `df #{media_path}|grep #{media_path}`.split /\n/
+  drive_device = result[0].split(/\s/)[0]
+  result = `/sbin/blkid #{drive_device}`
+  result = result.match(/LABEL="([^"]*)"/)
+  return result[1]
+end
+
+options = {}
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: arc-import [options] path"
+  options[:media] = 'hdd'
+  opts.on("-mMEDIA", "--media=MEDIA", "Specify type of media [hdd, cd, bd]") do |m|
+    options[:media] = m
+  end
+  opts.on("-cCASE", "--case=CASE", "Specify name of container") do |c|
+    options[:case] = c
+  end
+  opts.on("-lLOCATION", "--location=LOCATION", "Page location of disk i.e. p1d3") do |l|
+    options[:location] = l
+  end
+end.parse!
+
+import_path = ARGV.pop
+
+if !import_path then
+  puts "arc-import --help for usage"
+  exit
+end
+
+db = CouchRest.database!("http://clu:5984/archimedes-media")
+hostname = Socket.gethostname
+counter = 0
+
+system("mount #{import_path}") unless options[:media] == 'hdd'
+
+Find.find(import_path) do |f|
+  next unless File.file? f
+  stats = File::Stat.new f
+  relpath = f[import_path.length .. -1]
+# voodoo here to stop invalid characters from trying to import, seems to work
+  begin
+    filename = File.basename(f).encode('UTF-16le', invalid: :replace, replace: '').encode('UTF-8')
+    info = { 
+             :filename => filename, 
+             :path => File.dirname(relpath),
+             :size => stats.size,
+             :media => options[:media],
+             :mediapath => import_path,
+             :import_host => hostname
+            }
+    info[:sfv_content] = IO.read(f) if f.match("\.sfv$")
+    info[:media_label] = media_label(import_path) unless options[:media] == 'hdd'
+    info[:case] = options[:case] if options[:case]
+    info[:location] = options[:location] if options[:location]
+
+    db.save_doc(info, true, true) # bulk and batch = true
+  rescue Exception => e
+    puts "Problem saving \"#{f}\""
+    puts e.message
+    ap info
+  end
+  counter = counter + 1
+end
+
+system("umount #{import_path}") unless options[:media] == 'hdd'
+
+puts "#{counter} files imported"
+
+db.bulk_save

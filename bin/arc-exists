@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+
+# ask couchdb if the given filenames exist, and show it
+
+require 'rubygems'
+require 'awesome_print'
+require 'optparse'
+require 'couchrest'
+require 'socket'
+
+check_path = ARGV.pop
+
+db = CouchRest.database!("http://clu:5984/archimedes-media")
+
+#db.documents['rows'].each do |doc|
+#  document = db.get doc["id"]
+#  ap document
+#end
+
+view = db.view('media_by_name/media_by_name')
+
+row = db.view('media_by_name/media_by_name', :key => check_path)
+
+ap row
+

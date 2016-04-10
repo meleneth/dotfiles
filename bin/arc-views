@@ -1,0 +1,44 @@
+#!/usr/bin/env ruby
+
+# ask couchdb if the given filenames exist, and show it
+
+require 'rubygems'
+require 'awesome_print'
+require 'optparse'
+require 'couchrest'
+require 'socket'
+
+check_path = ARGV.pop
+
+def js_map_func(func_text)
+  return <<-JS
+function(doc) {
+    #{func_text}
+}
+JS
+end
+
+def js_reduce_func(func_text)
+  return <<-JS
+function(keys, values) {
+    #{func_text}
+}
+JS
+end
+
+def make_view(view_name, map_view_func, reduce_view_func)
+  db = CouchRest.database!("http://clu:5984/archimedes-media")
+#  db.delete_doc("_design/#{view_name}")
+  doc = { "_id" => "_design/#{view_name}", :views => {view_name => {}} }
+  doc[:views][view_name]["map"] = js_map_func(map_view_func) if map_view_func
+  doc[:views][view_name]["reduce"] = js_reduce_func(reduce_view_func) if reduce_view_func
+
+  db.save_doc(doc)
+end
+
+make_view("media_by_name", "emit(doc.filename, doc._id)", nil)
+make_view("media_case", "emit(doc.case, null)", "return true")
+make_view("media_info", "emit([doc.case, doc.location, doc.media_label, doc.path, doc.filename], doc.size)", "_sum")
+make_view("media_case_paths", "emit([doc.case, doc.path], null)", "return true")
+make_view("media_path", "emit(doc.path, null)", "return true")
+

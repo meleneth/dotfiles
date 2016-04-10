@@ -170,3 +170,4 @@ map <F5> :e .<CR>
 map! <F5> <ESC>:e .<CR> 
 map <F4> :e %:p:s,.hpp$,.X123X,:s,.cpp$,.hpp,:s,.X123X$,.cpp,<CR>
 
+"set list

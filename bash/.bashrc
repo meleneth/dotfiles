@@ -51,7 +51,7 @@ alias mdu='du -h --max-depth 1 |grep M |sort -g'
     IN="\[\033[0;1;32m\]"
     LG="\[\033[0;1;37m\]" # Light Grey
     DG="\[\033[0;37m\]" # Dark Grey
-    PS1="$LGÚ$DGÄ[$HN\u $NI@ $HN\h \w$DG]Ä$LGÄ¿\n$LGÀÄ$DGÄ\$$IN"
+    PS1="$LGï¿½$DGï¿½[$HN\u $NI@ $HN\h \w$DG]ï¿½$LGÄ¿\n$LGï¿½ï¿½$DGï¿½\$$IN"
     PS1="$NM[=- $HI\u$NI@$HN\h $SI\w$NM -=]\n  \$$DF"
 fi
 
@@ -109,3 +109,15 @@ alias rt="rake test > test_output.txt 2>&1 ; less test_output.txt"
 if [ -d ~/.rvm/bin ]; then
   PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
 fi
+
+export LC_ALL=en_US.UTF-8
+
+
+# {{{
+# Node Completion - Auto-generated, do not touch.
+shopt -s progcomp
+for f in $(command ls ~/.node-completion); do
+  f="$HOME/.node-completion/$f"
+  test -f "$f" && . "$f"
+done
+# }}}

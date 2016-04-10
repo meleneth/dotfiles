@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby
+
+# ask couchdb if the given filenames exist, and show it
+
+require 'rubygems'
+require 'awesome_print'
+require 'optparse'
+require 'couchrest'
+require 'socket'
+
+id_to_show = ARGV.pop
+
+db = CouchRest.database!("http://clu:5984/archimedes-media")
+
+document = db.get id_to_show
+
+ap document
+

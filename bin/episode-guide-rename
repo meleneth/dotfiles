@@ -8,6 +8,21 @@ require 'awesome_print'
 require 'table_print'
 require 'find'
 
+# next steps: rename related files so subtitles etc work correctly
+
+class String
+  def strip_leading_zeroes
+    gsub(/^0+/, "")
+  end
+
+  def padded
+    if match /^[0-9]$/
+      return "0#{self}"
+    end
+    self
+  end
+end
+
 class FilenameParser
   attr_accessor :season
   attr_accessor :episode
@@ -18,14 +33,47 @@ class FilenameParser
     @season = ""
     @episode = ""
 
-    if matched = filename.match(/S(\d+)\s(\d+)/) then
+    if matched = filename.match(/(s|S)(\d+)\s(\d+)/) then
+      @season = matched[1].strip_leading_zeroes
+      @episode = matched[2].strip_leading_zeroes
+      return
+    end
+    if matched = filename.match(/(s|S)(\d+)x*(e|E)(\d+)/) then
+      @season = matched[2].strip_leading_zeroes
+      @episode = matched[4].strip_leading_zeroes
+      return
+    end
+    if matched = filename.match(/ - (\d\d)(\d\d) - /) then
+      @season = matched[1].strip_leading_zeroes
+      @episode = matched[2].strip_leading_zeroes
+      return
+    end
+    if matched = filename.match(/ - (\d)(\d\d) - /) then
       @season = matched[1]
-      @episode = matched[2]
+      @episode = matched[2].strip_leading_zeroes
+      return
+    end
+
+    if matched = basename.match(/^(\d\d)(\d\d) /) then
+      @season = matched[1].strip_leading_zeroes
+      @episode = matched[2].strip_leading_zeroes
+      return
+    end
+    if matched = basename.match(/^(\d)(\d\d)/) then
+      @season = matched[1]
+      @episode = matched[2].strip_leading_zeroes
+      return
+    end
+    if matched = basename.match(/_(\d+)_/) then
+      @season = "1" # NOTE: NO SEASON FOUND
+      @episode = matched[1].strip_leading_zeroes
+      return
     end
   end
 
+
   def is_video?
-    extension.match(/(avi|mkv|mpg|mpeg|m4v)/)
+    extension.match(/(avi|mkv|mpg|mpeg|m4v|mp4)/)
   end
 
   def basename
@@ -48,14 +96,11 @@ file = File.read(filename)
 data = JSON.parse(file)
 
 series = File.basename(ARGV[0], ".*")
-puts series
-
-ap data
 
 episodes = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
 
 data.each do |d|
-  episodes[d["season_no"]][d["episode_no"]] = d["name"]
+  episodes[d["season_no"].strip_leading_zeroes][d["episode_no"].strip_leading_zeroes] = d["name"]
 end
 
 ap episodes
@@ -63,16 +108,8 @@ ap episodes
 Find.find('.') do |e|
   next if File.directory? e
   fp = FilenameParser.new e
-#  awesome_print fp
   next unless fp.is_video?
-
-#  puts "is_video (ahuh)" if fp.is_video?
-#  puts "basename: #{fp.basename}"
-#  puts "extension: #{fp.extension}"
-#  puts "dirname: #{fp.dirname}"
-#
-#  puts "FINAL::"
-  puts " mv \"#{fp.filename}\" \"#{fp.dirname}/#{series} - s#{fp.season}e#{fp.episode} - #{episodes[fp.season][fp.episode]}#{fp.extension}\""
+  puts " mv \"#{fp.filename}\" \"#{fp.dirname}/#{series} - s#{fp.season.padded}e#{fp.episode.padded} - #{episodes[fp.season][fp.episode]}#{fp.extension}\""
 end
 
 # vim: ft=ruby
