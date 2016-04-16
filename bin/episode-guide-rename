@@ -8,20 +8,12 @@ require 'awesome_print'
 require 'table_print'
 require 'find'
 
+$LOAD_PATH << "#{Pathname.new(File.expand_path(__FILE__)).realpath.dirname}"
+
+require 'lib/monkey_patches'
+require 'lib/episode_guess'
+
 # next steps: rename related files so subtitles etc work correctly
-
-class String
-  def strip_leading_zeroes
-    gsub(/^0+/, "")
-  end
-
-  def padded
-    if match /^[0-9]$/
-      return "0#{self}"
-    end
-    self
-  end
-end
 
 class FilenameParser
   attr_accessor :season
@@ -33,44 +25,12 @@ class FilenameParser
     @season = ""
     @episode = ""
 
-    if matched = filename.match(/(s|S)(\d+)\s(\d+)/) then
-      @season = matched[1].strip_leading_zeroes
-      @episode = matched[2].strip_leading_zeroes
-      return
-    end
-    if matched = filename.match(/(s|S)(\d+)x*(e|E)(\d+)/) then
-      @season = matched[2].strip_leading_zeroes
-      @episode = matched[4].strip_leading_zeroes
-      return
-    end
-    if matched = filename.match(/ - (\d\d)(\d\d) - /) then
-      @season = matched[1].strip_leading_zeroes
-      @episode = matched[2].strip_leading_zeroes
-      return
-    end
-    if matched = filename.match(/ - (\d)(\d\d) - /) then
-      @season = matched[1]
-      @episode = matched[2].strip_leading_zeroes
-      return
-    end
-
-    if matched = basename.match(/^(\d\d)(\d\d) /) then
-      @season = matched[1].strip_leading_zeroes
-      @episode = matched[2].strip_leading_zeroes
-      return
-    end
-    if matched = basename.match(/^(\d)(\d\d)/) then
-      @season = matched[1]
-      @episode = matched[2].strip_leading_zeroes
-      return
-    end
-    if matched = basename.match(/_(\d+)_/) then
-      @season = "1" # NOTE: NO SEASON FOUND
-      @episode = matched[1].strip_leading_zeroes
-      return
+    guess = episode_guess(filename)
+    if guess then
+      @season = guess[:season]
+      @episode = guess[:episode]
     end
   end
-
 
   def is_video?
     extension.match(/(avi|mkv|mpg|mpeg|m4v|mp4)/)
