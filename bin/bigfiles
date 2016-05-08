@@ -1,0 +1,8 @@
+#!/bin/bash
+
+TMPFILENAME="/tmp/tmpfile.$PPID"
+
+du -h -x > $TMPFILENAME
+cat $TMPFILENAME | egrep ^[0-9\.]+G |sort -nr
+cat $TMPFILENAME |egrep ^[0-9\.]+M |sort -nr | head -n 40
+
