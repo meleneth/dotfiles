@@ -32,6 +32,10 @@ def fix_perms(path)
 end
 
 
+if ARGV.empty?
+  ARGV.push '.'
+end
+
 ARGV.each do |path|
   fix_perms(path)
 end
