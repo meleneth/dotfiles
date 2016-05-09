@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+require 'optparse'
+
+options = {}
+
+optparse = OptionParser.new do |opts|
+  opts.banner = "Usage: fix-perms [options] [files]"
+  opts.separator ""
+  opts.separator "Will set files to be 0664 and directories to be 0775"
+  opts.separator ""
+
+  opts.on('-h', '--help', 'Displays Help') do
+    puts opts
+    exit
+  end
+end
+
+optparse.parse!
+
+def fix_perms(path)
+  if File.directory? path
+    File.chmod 0775, path
+    entries = Dir.entries path
+    entries.each do |e|
+      next if e == "."
+      next if e == ".."
+      fix_perms File.join path, e
+    end
+  else
+    File.chmod 0664, path
+  end
+end
+
+
+ARGV.each do |path|
+  fix_perms(path)
+end
+
+
