@@ -1,3 +1,4 @@
+execute pathogen#infect()
 version 6.0
 set noautoindent
 set nobackup
@@ -12,6 +13,8 @@ set hidden
 set iskeyword=@,48-57,_,192-255,-,.,:,/,@-@
 set lazyredraw
 set display=uhex
+let mapleader=","
+nnoremap ; :
 "set listchars=tab:»·,trail:·
 set smartindent
 set statusline=[%n]\ %F\ %(\ %M%R%H)%)\ \@(%l\,%c%V)\ %P
