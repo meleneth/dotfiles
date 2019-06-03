@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+target_file=$@
+
+current_dir=$PWD
+
+while [ $current_dir != "/" ] ; do
+  cd ..
+  current_dir=$PWD
+  if [ -f $target_file ]
+    then
+      echo $current_dir
+      exit
+    fi
+done
