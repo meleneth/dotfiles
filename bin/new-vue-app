@@ -8,15 +8,7 @@ vue add coffee
 vue add axios
 vue add pug
 
-npm install --save lodash
-npm install --save pouchdb
-npm install --save machina
-npm install --save d3
-npm install --save moment
-npm install --save vue-moment
-npm install --save vue-material
-npm install --save node-sass
-npm install --save sass-loader
+npm install --save lodash pouchdb machina d3 moment vue-moment vue-material node-sass sass-loader
 
 git init
 git add . 
@@ -25,25 +17,49 @@ git commit -m "First commit - new vue project $@"
 cd src
 
 cat main.js | grep import > main2.js
-echo "import VueMaterial from 'vue-material'" >> main2.js
-echo "import 'vue-material/dist/vue-material.min.css'" >> main2.js
-echo >> main2.js
-echo "Vue.use(VueMaterial)" >> main2.js
-echo "Vue.use(require('vue-moment'))" >> main2.js
-echo >> main2.js
+
+{
+cat <<HERE
+import VueMaterial from 'vue-material'
+import 'vue-material/dist/vue-material.min.css'
+
+Vue.use(VueMaterial)
+Vue.use(require('vue-moment'))
+
+HERE
+} >> main2.js
+
 cat main.js | grep -v import >> main2.js
 mv main2.js main.js
 
-echo "<style lang="scss">" >> App.vue
-echo "@import \"~vue-material/dist/theme/engine\"; // Import the theme engine" >> App.vue
-echo "" >> App.vue
-echo "@include md-register-theme(\"default\", (" >> App.vue
-echo "  primary: md-get-palette-color(blue, A200), // The primary color of your application" >> App.vue
-echo "  accent: md-get-palette-color(red, A200) // The accent or secondary color" >> App.vue
-echo "));" >> App.vue
-echo "" >> App.vue
-echo "@import \"~vue-material/dist/theme/all\"; // Apply the theme" >> App.vue
-echo "</style>" >> App.vue
+{
+cat <<HERE
+<template lang="pug">
+  .page-container
+    md-app
+      md-app-toolbar.md-primary
+        span.md-title $@
+      md-app-content
+        <router-link to="/">Home</router-link> |
+        <router-link to="/about">About</router-link>
+        <router-view/>
+</template>
+<script lang="coffee">
+export default
+  name: 'App',
+</script>
+<style lang="scss">"
+@import "~vue-material/dist/theme/engine"; // Import the theme engine
+
+@include md-register-theme("default", (
+  primary: md-get-palette-color(blue, A200), // The primary color of your application
+  accent: md-get-palette-color(red, A200) // The accent or secondary color
+));
+
+@import "~vue-material/dist/theme/all"; // Apply the theme
+</style>
+HERE
+} > App.vue
 
 git add .
 git commit -a -m "Initial mods so everything works"
